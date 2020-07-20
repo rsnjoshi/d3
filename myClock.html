@@ -1,0 +1,132 @@
+<html>
+
+<head>
+    <title>Clock</title>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+</head>
+
+<body>
+    <script>
+        var seconds, minutes, hours, secondDegree, minuteDegree, hourDegree
+
+        const secondScale = d3.scaleLinear()
+            .range([0, 359])
+            .domain([0, 59])
+
+        const minuteScale = d3.scaleLinear()
+            .range([0, 359])
+            .domain([0, 59])
+
+        const hourScale = d3.scaleLinear()
+            .range([0, 359])
+            .domain([0, 11])
+
+        const svg = d3.select('body').append('svg')
+            .attr('width', 500)
+            .attr('height', 500);
+
+        const mechanism = svg.append('g')
+            .attr('transform', 'translate(250, 250)')
+
+        function timeRefresh() {
+            const time = new Date();
+            seconds = time.getSeconds();
+            hours = time.getHours() % 12;
+            minutes = time.getMinutes();
+        }
+
+        function normalize() {
+            timeRefresh();
+            secondDegree = secondScale(seconds);
+            minuteDegree = minuteScale(minutes);
+            hourDegree = hourScale(hours);
+        }
+
+
+        function coordinates() {
+            normalize();
+
+            var color = d3.scaleOrdinal(['white','purple']);
+
+            var segment = new Array();
+
+            var arc = d3.arc()
+                        .innerRadius(130)
+                        .outerRadius(150)
+            
+            for(var i = 0; i < 60; i++){
+                segment.push(1);
+            }
+
+            var pie = d3.pie()
+
+            var arcs = mechanism.selectAll("arc")
+                    .data(pie(segment))
+                    .enter()
+                        .append("g")
+                        .attr("class", "arc")
+            
+            arcs.append("path")
+                .attr("fill", function(d, i) {
+                    if(i % 5 === 0){
+                        return color(1);
+                    }else{
+                        return color(0);
+                    }
+                })
+                .attr("d", arc)
+
+            var brand = mechanism.append('text')
+                .attr('x', -48)
+                .attr('y', -40)
+                .text('C O T I V I T I')
+                .attr('fill', 'purple')
+
+            var secondHand = mechanism.append('line')
+                .attr('x1', 0)
+                .attr('y1', 15)
+                .attr('x2', 0)
+                .attr('y2', -120)
+                .attr('stroke', 'red')
+                .attr('transform', 'rotate(' + secondDegree + ')')
+
+            var minuteHand = mechanism.append('line')
+                .attr('x1', 0)
+                .attr('y1', 0)
+                .attr('x2', 0)
+                .attr('y2', -90)
+                .attr('stroke', 'blue')
+                .attr('stroke-width', 5)
+                .attr('transform', 'rotate(' + minuteDegree + ')')
+
+            var hourHand = mechanism.append('line')
+                .attr('x1', 0)
+                .attr('y1', 0)
+                .attr('x2', 0)
+                .attr('y2', -60)
+                .attr('stroke', 'blue')
+                .attr('stroke-width', 7)
+                .attr('transform', 'rotate(' + hourDegree + ')')
+            
+            var pin = mechanism.append('circle')
+                .attr('cx', 0)
+                .attr('cy', 0)
+                .attr('r', 5)
+                .attr('fill', 'purple')
+
+            setInterval(() => {
+                normalize();
+                secondHand.transition()
+                    .attr('transform', 'rotate(' + secondDegree + ')');
+                minuteHand.transition()
+                    .attr('transform', 'rotate(' + minuteDegree + ')');
+                hourHand.transition()
+                    .attr('transform', 'rotate(' + hourDegree + ')');
+            }, 1000)
+        }
+
+        coordinates()
+    </script>
+</body>
+
+</html>

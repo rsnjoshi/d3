@@ -1,6 +1,14 @@
 <html>
     <head>
         <script src="https://d3js.org/d3.v4.min.js"></script>
+        <style>
+            svg{
+                transition: 2s;
+            }
+            svg:hover{
+                transform: rotateY(360deg);
+            }
+        </style>
     </head>
 <body>
     <svg width="300" height="200"> </svg>
@@ -27,18 +35,25 @@
     
         //Generate groups
         var arcs = g.selectAll("arc")
-                    .data([{startAngle: 0, endAngle: 3}, {startAngle: 3, endAngle: 6.2}])
+                    .data(pie(data))
                     .enter()
                         .append("g")
                         .attr("class", "arc")
-                        .append("path")
+                        
+        var data = arcs.append("path")
                         .attr("fill", function(d, i) {
                             return color(i);
                         })
-                        .attr("d", arc);
-    
+                        .attr("d", arc)
         //Draw arc paths
-      
+       var paragraph = arcs.append('text')
+                            .attr('transform', function(d){
+                                return "translate(" + arc.centroid(d) + ")"
+                            })
+                            .text(function(d){
+                                return d.value
+                            })
+                            .attr('fill', 'white')
     </script>
     </body>
     </html>

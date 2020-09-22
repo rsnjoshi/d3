@@ -33,6 +33,7 @@
             seconds = time.getSeconds();
             hours = time.getHours() % 12;
             minutes = time.getMinutes();
+            console.log(seconds, ' ', hours, ' ', minutes)
         }
 
         function normalize() {
@@ -92,7 +93,7 @@
 
             var minuteHand = mechanism.append('line')
                 .attr('x1', 0)
-                .attr('y1', 0)
+                .attr('y1', 10)
                 .attr('x2', 0)
                 .attr('y2', -90)
                 .attr('stroke', 'blue')
@@ -101,7 +102,7 @@
 
             var hourHand = mechanism.append('line')
                 .attr('x1', 0)
-                .attr('y1', 0)
+                .attr('y1', 10)
                 .attr('x2', 0)
                 .attr('y2', -60)
                 .attr('stroke', 'blue')

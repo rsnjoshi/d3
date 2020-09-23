@@ -1,0 +1,170 @@
+<html>
+
+<head>
+    <title>Tree Map</title>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+</head>
+
+<body>
+    <script>
+        const data = {
+            name: "food",
+            children: [
+                {
+                    name: "mitho",
+                    children: [
+                        {
+                            name: "aloo",
+                            children: [
+                                {name: 'chips'},
+                                {name: 'french fry'},
+                                {name: 'samosha'},
+                                {name: 'chop'}
+                            ]
+                        },
+                        { name: 'masu' },
+                        { name: 'anda' },
+                        { 
+                            name: 'noodles',
+                            children: [
+                                {
+                                    name: 'piro',
+                                    children: [
+                                        {name: 'Ramen'},
+                                        {name: '2pm'},
+                                        {name: 'current'}
+                                    ]
+                                },
+                                {
+                                    name: 'napiro',
+                                    children: [
+                                        {name: 'wai wai'},
+                                        {name: 'quicks'},
+                                        {name: 'rumpum'}
+                                    ]
+                                }
+                            ]
+                        },
+                        { 
+                            name: 'momo',
+                            children: [
+                                {name: 'buff'},
+                                {name: 'chicken'},
+                                {name: 'veg'}
+                            ]
+                        }
+                    ]
+                },
+                {
+                    name: "namitho",
+                    children: [
+                        { name: "ghiraula" },
+                        { name: "karela" },
+                        { name: "lauka" },
+                        { name: 'bakula' }
+                    ]
+                }
+            ]
+        }
+
+        const root = d3.hierarchy(data)
+        const tree = d3.tree().nodeSize([50, 300])
+        tree(root)
+        console.log(root)
+        const links = root.links()
+        console.log(links)
+        const descendants = root.descendants()
+        console.log(descendants)
+
+        const diagonal = d3.linkHorizontal().x(d => d.y).y(d => d.x)
+
+        const svg = d3.select('body').append("svg")
+            .attr("width", 2000)
+            .attr("height", 2000)
+
+        const gLink = svg.append("g")
+            .attr("fill", "none")
+            .attr("stroke", "#555")
+            .attr("stroke-opacity", 0.5)
+            .attr("stroke-width", 1)
+            .attr('transform', 'translate(20, 1000)')
+
+        const link = gLink.selectAll("path")
+            .data(links)
+            .enter()
+            .append('path')
+            .attr('d', function (d) {
+                return diagonal(d)
+            })
+        const dots = gLink.selectAll("circle")
+            .data(descendants)
+            .enter()
+            .append('circle')
+            .attr('cx', d => d.y)
+            .attr('cy', d => d.x)
+            .attr('r', 9)
+            .attr('fill', '#BC89DE')
+
+        const text = gLink.selectAll('text')
+            .data(descendants)
+            .enter()
+            .append('text')
+            .text(d => d.data.name)
+            .attr('x', d => {
+                if (!d.children) {
+                    return d.y + 12
+                } else {
+                    return d.y - 10
+                }
+            })
+            .attr('y', d => {
+                if (!d.children) {
+                    return d.x + 4
+                } else {
+                    return d.x - 12
+                }
+            })
+            .attr('stroke', 'none')
+            .attr('font-size', '25px')
+            .attr('fill', 'black')
+        
+        let depthAxis = []
+        let previousDepth = -1
+        descendants.forEach(element => {
+            const currentDepth = element.depth
+            if(previousDepth != currentDepth){
+                depthAxis.push(element.y)
+                previousDepth = currentDepth
+            }
+        });
+        console.log(depthAxis)
+
+        const firstXcoordinate = depthAxis[2] + 150
+        const secondXcoordinate = depthAxis[3] + 150
+        console.log(firstXcoordinate)
+        console.log(secondXcoordinate)
+        const partition = gLink.selectAll("line")
+                          .data([{'coordinate' : firstXcoordinate, 'label' : 'Types'}, {'coordinate' : secondXcoordinate, 'label': 'Brand'}])
+        
+        const line = partition.enter()
+                          .append('line')
+                          .attr('x1', d => d.coordinate)
+                          .attr('y1', -800)
+                          .attr('x2', d => d.coordinate)
+                          .attr('y2', 800)
+                          .attr('stroke', 'black')
+                          .attr("stroke-opacity", 0.3)
+
+        const label = partition.enter()
+                               .append('text')
+                               .attr('x', d => d.coordinate + 50)
+                               .attr('y', -650)
+                               .text(d => d.label)
+                               .attr('fill', 'black')
+                               .attr('font-size', '40px')
+                               .attr('stroke', 'none')
+    </script>
+
+</body>
+
+</html>
